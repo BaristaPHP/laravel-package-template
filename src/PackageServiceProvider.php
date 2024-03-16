@@ -1,5 +1,7 @@
 <?php
 
+namespace Vendor\Package;
+
 use Illuminate\Support\ServiceProvider;
 
 class PackageServiceProvider extends ServiceProvider
