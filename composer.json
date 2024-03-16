@@ -1,5 +1,5 @@
 {
-    "name": ":vendor/:package",
+    "name": "vendor/package",
     "description": ":package_description",
     "autoload": {
         "psr-4": {
@@ -14,17 +14,15 @@
     "authors": [
         {
             "name": ":author_name",
-            "email": ":author_email"
+            "email": "author@domain.com"
         }
     ],
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "illuminate/support": "^11.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
-        "nunomaduro/collision": "^8.1",
-        "larastan/larastan": "^2.9",
-        "orchestra/testbench": "^8.22",
         "pestphp/pest": "^2.34"
     },
     "scripts": {
@@ -42,5 +40,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
 }
