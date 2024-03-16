@@ -3,12 +3,12 @@
     "description": ":package_description",
     "autoload": {
         "psr-4": {
-            ":VendorName\\:Package\\": "src/"
+            "Vendor\\Package\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            ":VendorName\\:Package\\Tests\\": "tests/"
+            "Vendor\\Package\\Tests\\": "tests/"
         }
     },
     "authors": [
