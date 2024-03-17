@@ -111,11 +111,10 @@ function updateNamespace(&$array, $vendor, $packageName): array
 
 $composer = getComposerContents();
 
-setAuthorInfo($composer);
-
 $packageName = ask('Package Name');
 $packageDescription = ask('Package Description');
 
+$composer = setAuthorInfo($composer);
 $composer = setPackageInfo($composer, $packageName, $packageDescription);
 
 updateNamespace($composer['autoload']['psr-4'], VENDOR, $packageName);
