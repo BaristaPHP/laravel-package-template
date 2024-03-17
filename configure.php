@@ -81,7 +81,7 @@ function setAuthorInfo($composer): array
 
 function setPackageInfo($composer, ...$info): array
 {
-    $composer['name'] = strtolower(VENDOR)."/$info[0]";
+    $composer['name'] = strtolower(VENDOR) . "/$info[0]";
     $composer['description'] = $info[1];
 
     return $composer;
@@ -92,13 +92,11 @@ function setPackageInfo($composer, ...$info): array
  *
  * @param $array
  * @param $vendor
- * @param $packageName
+ * @param $package
  * @return mixed
  */
-function updateNamespace(&$array, $vendor, $packageName): array
+function updateNamespace(&$array, $vendor, $package): array
 {
-    $package = str_replace('-', '', ucwords($packageName, '-'));
-
     foreach ($array as $namespace => $path) {
         if (str_contains($namespace, 'Vendor\\Package\\')) {
             unset($array[$namespace]);
@@ -112,12 +110,39 @@ function updateNamespace(&$array, $vendor, $packageName): array
 $composer = getComposerContents();
 
 $packageName = ask('Package Name');
+$package = str_replace('-', '', ucwords($packageName, '-'));
 $packageDescription = ask('Package Description');
 
 $composer = setAuthorInfo($composer);
 $composer = setPackageInfo($composer, $packageName, $packageDescription);
 
-updateNamespace($composer['autoload']['psr-4'], VENDOR, $packageName);
-updateNamespace($composer['autoload-dev']['psr-4'], VENDOR, $packageName);
+
+updateNamespace($composer['autoload']['psr-4'], VENDOR, $package);
+updateNamespace($composer['autoload-dev']['psr-4'], VENDOR, $package);
+
+$providers = $composer['extra']['laravel']['providers'];
+$aliases = $composer['extra']['laravel']['aliases'];
+
+foreach ($providers as $key => $provider) {
+    if (str_contains($provider, 'Vendor\\Package\\')) {
+        $providers[$key] = str_replace('Vendor\\Package\\', VENDOR . '\\' . $package . '\\', $provider);
+        $providers[$key] = str_replace('PackageServiceProvider', $package . 'ServiceProvider', $providers[$key]);
+    }
+}
+
+foreach ($aliases as $key => $alias) {
+    // replace Package in key with the package name
+    $newKey = str_replace('Package', $package, $key);
+    unset($aliases[$key]);
+
+    // replace Vendor\Package with package namespace
+    if (str_contains($alias, 'Vendor\\Package\\')) {
+        $aliases[$newKey] = str_replace('Vendor\\Package\\', VENDOR . '\\' . $package . '\\', $alias);
+        $aliases[$newKey] = str_replace('Package', $package, $aliases[$newKey]);
+    }
+}
+
+$composer['extra']['laravel']['providers'] = $providers;
+$composer['extra']['laravel']['aliases'] = $aliases;
 
 updateComposerContents($composer);
