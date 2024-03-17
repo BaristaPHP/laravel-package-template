@@ -1,6 +1,7 @@
 <?php
 
 const VENDOR = 'Barista';
+const EMAIL = 'contact@barista-php.com';
 
 /**
  * Reads a line from the console and returns the input or default value.
@@ -40,7 +41,7 @@ function updateComposerContent(array $composerData): void {
  */
 function setAuthorInfo(array &$composerData): void {
     $composerData['authors'] = [
-        ['name' => VENDOR, 'email' => 'contact@barista-php.com'],
+        ['name' => VENDOR, 'email' => EMAIL],
     ];
 }
 
@@ -88,6 +89,7 @@ function updateLaravelConfig(array &$composerData, string $package): void {
             if (str_contains($item, 'Vendor\\Package\\')) {
                 $items[$key] = str_replace('Vendor\\Package\\', VENDOR . '\\' . $package . '\\', $item);
                 $items[$key] = str_replace('PackageServiceProvider', $package . 'ServiceProvider', $items[$key]);
+                $items[$key] = str_replace('Package', $package, $items[$key]);
             }
         }
     };
