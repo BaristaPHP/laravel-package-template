@@ -1,5 +1,5 @@
 {
-    "name": "vendor/package",
+    "name": ":vendor/:package",
     "description": ":package_description",
     "autoload": {
         "psr-4": {
@@ -32,10 +32,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                ":VendorName\\:Package\\:PackageServiceProvider"
+                ":Vendor\\:Package\\:PackageServiceProvider"
             ],
             "aliases": {
-                ":Package": ":VendorName\\:Package\\Facades\\:Package"
+                ":Package": ":Vendor\\:Package\\Facades\\:Package"
             }
         }
     },
