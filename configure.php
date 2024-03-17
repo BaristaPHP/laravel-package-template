@@ -64,9 +64,10 @@ function updateComposerContents(mixed $composer): void
 /**
  * Set the author information in the composer.json file
  *
- * @return void
+ * @param $composer
+ * @return array
  */
-function setAuthorInfo($composer): void
+function setAuthorInfo($composer): array
 {
     $composer['authors'] = [
         [
@@ -74,6 +75,8 @@ function setAuthorInfo($composer): void
             'email' => 'contact@barista-php.com',
         ],
     ];
+
+    return $composer;
 }
 
 function setPackageInfo($composer, ...$info): array
