@@ -4,42 +4,39 @@ const VENDOR = 'Barista';
 
 /**
  * Reads a line from the console and returns the input or default value.
+ *
+ * @param string $question
+ * @param string $default
+ * @return string
  */
 function prompt(string $question, string $default = ''): string {
-    $answer = readline($question . ($default ? " ({$default})" : '') . ': ');
-    return $answer ?: $default;
-}
-
-/**
- * Executes a shell command and returns the trimmed output.
- */
-function executeCommand(string $command): string {
-    return trim(shell_exec($command));
-}
-
-/**
- * Outputs a line to the console with a newline.
- */
-function outputLine(string $line): void {
-    echo $line . PHP_EOL;
+    return readline($question . ($default ? " ({$default})" : '') . ': ') ?: $default;
 }
 
 /**
  * Reads the composer.json file and returns its contents as an array.
+ *
+ * @return array
  */
-function readComposerFile(): array {
+function getComposerContent(): array {
     return json_decode(file_get_contents('composer.json'), true);
 }
 
 /**
  * Writes the given array to the composer.json file.
+ *
+ * @param array $composerData
+ * @return void
  */
-function writeComposerFile(array $composerData): void {
+function updateComposerContent(array $composerData): void {
     file_put_contents('composer.json', json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
 
 /**
  * Updates the author information in the given composer data array.
+ *
+ * @param array $composerData
+ * @return void
  */
 function setAuthorInfo(array &$composerData): void {
     $composerData['authors'] = [
@@ -49,6 +46,11 @@ function setAuthorInfo(array &$composerData): void {
 
 /**
  * Updates the package information in the given composer data array.
+ *
+ * @param array $composerData
+ * @param string $name
+ * @param string $description
+ * @return void
  */
 function setPackageInfo(array &$composerData, string $name, string $description): void {
     $composerData['name'] = strtolower(VENDOR) . "/$name";
@@ -57,6 +59,11 @@ function setPackageInfo(array &$composerData, string $name, string $description)
 
 /**
  * Updates the namespaces in the given autoload configuration array.
+ *
+ * @param array $autoloadConfig
+ * @param string $vendor
+ * @param string $package
+ * @return void
  */
 function updateNamespaces(array &$autoloadConfig, string $vendor, string $package): void {
     foreach ($autoloadConfig as $namespace => $path) {
@@ -69,10 +76,33 @@ function updateNamespaces(array &$autoloadConfig, string $vendor, string $packag
 }
 
 /**
- * Starts the configuration process.
+ * Updates Laravel specific configurations in the composer data.
+ *
+ * @param array $composerData
+ * @param string $package
+ * @return void
+ */
+function updateLaravelConfig(array &$composerData, string $package): void {
+    $updateServiceProviderAndAliases = function (&$items, $package) {
+        foreach ($items as $key => $item) {
+            if (str_contains($item, 'Vendor\\Package\\')) {
+                $items[$key] = str_replace('Vendor\\Package\\', VENDOR . '\\' . $package . '\\', $item);
+                $items[$key] = str_replace('PackageServiceProvider', $package . 'ServiceProvider', $items[$key]);
+            }
+        }
+    };
+
+    $updateServiceProviderAndAliases($composerData['extra']['laravel']['providers'], $package);
+    $updateServiceProviderAndAliases($composerData['extra']['laravel']['aliases'], $package);
+}
+
+/**
+ * Configures the composer.json file for the new package.
+ *
+ * @return void
  */
 function configureComposer(): void {
-    $composerData = readComposerFile();
+    $composerData = getComposerContent();
 
     $packageName = prompt('Package Name');
     $formattedName = str_replace('-', '', ucwords($packageName, '-'));
@@ -86,24 +116,7 @@ function configureComposer(): void {
 
     updateLaravelConfig($composerData, $formattedName);
 
-    writeComposerFile($composerData);
-}
-
-/**
- * Updates Laravel specific configurations in the composer data.
- */
-function updateLaravelConfig(array &$composerData, string $package): void {
-    $updateServiceProviderAndAliases = function (&$items, $package) {
-        foreach ($items as $key => $item) {
-            if (str_contains($item, 'Vendor\\Package\\')) {
-                $items[$key] = str_replace('Vendor\\Package\\', VENDOR . '\\' . $package . '\\', $item);
-                $items[$key] = str_replace('PackageServiceProvider', $package . 'ServiceProvider', $items[$key]);
-            }
-        }
-    };
-
-    $updateServiceProviderAndAliases($composerData['extra']['laravel']['providers'], $package);
-    $updateServiceProviderAndAliases($composerData['extra']['laravel']['aliases'], $package, true);
+    updateComposerContent($composerData);
 }
 
 configureComposer();

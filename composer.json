@@ -1,20 +1,20 @@
 {
-    "name": ":vendor/:package",
-    "description": ":package_description",
+    "name": "barista/laravel-inbox",
+    "description": "Dummy Description",
     "autoload": {
         "psr-4": {
-            "Vendor\\Package\\": "src/"
+            "Barista\\LaravelInbox\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Vendor\\Package\\Tests\\": "tests/"
+            "Barista\\LaravelInbox\\Tests\\": "tests/"
         }
     },
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com"
+            "name": "Barista",
+            "email": "contact@barista-php.com"
         }
     ],
     "require": {
