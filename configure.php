@@ -74,8 +74,6 @@ function setAuthorInfo($composer): void
             'email' => 'contact@barista-php.com',
         ],
     ];
-
-    UpdateComposerContents($composer);
 }
 
 function setPackageInfo($composer, ...$info): array
@@ -91,7 +89,7 @@ function setPackageInfo($composer, ...$info): array
  *
  * @param $array
  * @param $vendor
- * @param $package
+ * @param $packageName
  * @return mixed
  */
 function updateNamespace(&$array, $vendor, $packageName): array
