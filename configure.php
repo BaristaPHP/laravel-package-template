@@ -98,6 +98,21 @@ function updateLaravelConfig(array &$composerData, string $package): void {
     $updateServiceProviderAndAliases($composerData['extra']['laravel']['aliases'], $package);
 }
 
+function getReadmeContent(): string {
+    return file_get_contents('README.md');
+}
+
+// Add this function to update the README file
+function updateReadmeContent(string $readmeContent, string $packageName, string $authorName, string $authorUsername): void {
+    $updatedContent = str_replace(':package_description', $packageName, $readmeContent);
+    $updatedContent = str_replace(':vendor', strtolower(VENDOR), $updatedContent);
+    $updatedContent = str_replace(':package', strtolower($packageName), $updatedContent);
+    $updatedContent = str_replace(':author_name', $authorName, $updatedContent);
+    $updatedContent = str_replace(':author_username', $authorUsername, $updatedContent);
+
+    file_put_contents('README.md', $updatedContent);
+}
+
 /**
  * Configures the composer.json file for the new package.
  *
@@ -109,6 +124,7 @@ function configureComposer(): void {
     $packageName = prompt('Package Name');
     $formattedName = str_replace('-', '', ucwords($packageName, '-'));
     $packageDescription = prompt('Package Description');
+    $authorGithubUsername = prompt('Author GitHub Username', 'your-github-username');
 
     setAuthorInfo($composerData);
     setPackageInfo($composerData, $packageName, $packageDescription);
@@ -117,6 +133,12 @@ function configureComposer(): void {
     updateNamespaces($composerData['autoload-dev']['psr-4'], VENDOR, $formattedName);
 
     updateLaravelConfig($composerData, $formattedName);
+
+    $authorName = VENDOR;
+    $authorUsername = 'your-github-username';
+
+    $readmeContent = getReadmeContent();
+    updateReadmeContent($readmeContent, $formattedName, $authorName, $authorGithubUsername);
 
     updateComposerContent($composerData);
 }
