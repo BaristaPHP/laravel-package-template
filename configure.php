@@ -110,7 +110,7 @@ function updateReadmeContent(string $readmeContent, string $packageName, string 
     $updatedContent = str_replace(':author_name', $authorName, $updatedContent);
     $updatedContent = str_replace(':author_username', $authorUsername, $updatedContent);
 
-    file_put_contents('README.md', $updatedContent);
+    getReadmeContent($updatedContent);
 }
 
 /**
