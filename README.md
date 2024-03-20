@@ -27,10 +27,6 @@ php artisan vendor:publish --tag=":package-config"
 php artisan test
 ```
 
-## Credits
-
-- [:author_name](https://github.com/:author_username)
-
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
