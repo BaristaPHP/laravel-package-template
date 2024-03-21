@@ -10,7 +10,8 @@ const EMAIL = 'contact@barista-php.com';
  * @param string $default
  * @return string
  */
-function prompt(string $question, string $default = ''): string {
+function prompt(string $question, string $default = ''): string
+{
     return readline($question . ($default ? " ({$default})" : '') . ': ') ?: $default;
 }
 
@@ -19,7 +20,8 @@ function prompt(string $question, string $default = ''): string {
  *
  * @return array
  */
-function getComposerContent(): array {
+function getComposerContent(): array
+{
     return json_decode(file_get_contents('composer.json'), true);
 }
 
@@ -29,7 +31,8 @@ function getComposerContent(): array {
  * @param array $composerData
  * @return void
  */
-function updateComposerContent(array $composerData): void {
+function updateComposerContent(array $composerData): void
+{
     file_put_contents('composer.json', json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
 
@@ -39,7 +42,8 @@ function updateComposerContent(array $composerData): void {
  * @param array $composerData
  * @return void
  */
-function setAuthorInfo(array &$composerData): void {
+function setAuthorInfo(array &$composerData): void
+{
     $composerData['authors'] = [
         ['name' => VENDOR, 'email' => EMAIL],
     ];
@@ -53,7 +57,8 @@ function setAuthorInfo(array &$composerData): void {
  * @param string $description
  * @return void
  */
-function setPackageInfo(array &$composerData, string $name, string $description): void {
+function setPackageInfo(array &$composerData, string $name, string $description): void
+{
     $composerData['name'] = strtolower(VENDOR) . "/$name";
     $composerData['description'] = $description;
 }
@@ -66,7 +71,8 @@ function setPackageInfo(array &$composerData, string $name, string $description)
  * @param string $package
  * @return void
  */
-function updateNamespaces(array &$autoloadConfig, string $vendor, string $package): void {
+function updateNamespaces(array &$autoloadConfig, string $vendor, string $package): void
+{
     foreach ($autoloadConfig as $namespace => $path) {
         if (str_contains($namespace, 'Vendor\\Package\\')) {
             unset($autoloadConfig[$namespace]);
@@ -83,7 +89,8 @@ function updateNamespaces(array &$autoloadConfig, string $vendor, string $packag
  * @param string $package
  * @return void
  */
-function updateLaravelConfig(array &$composerData, string $package): void {
+function updateLaravelConfig(array &$composerData, string $package): void
+{
     $updateServiceProviderAndAliases = function (&$items, $package) {
         foreach ($items as $key => $item) {
             if (str_contains($item, 'Vendor\\Package\\')) {
@@ -99,19 +106,47 @@ function updateLaravelConfig(array &$composerData, string $package): void {
 }
 
 /**
- * Configures the composer.json file for the new package.
+ * Returns the content of the README.md file.
  *
+ * @return string
+ */
+function getReadmeContent(): string
+{
+    return file_get_contents('README.md');
+}
+
+/**
+ * Updates the README.md file with the given content.
+ *
+ * @param string $readmeContent
+ * @param $packageName
+ * @param $packageDescription
  * @return void
  */
-function configureComposer(): void {
-    $composerData = getComposerContent();
+function updateReadmeContent(string $readmeContent, $packageName, $packageDescription): void
+{
+    $readmeContent = str_replace(':package_description', $packageDescription, $readmeContent);
+    $readmeContent = str_replace(':vendor', strtolower(VENDOR), $readmeContent);
+    $readmeContent = str_replace(':package', $packageName, $readmeContent);
 
-    $packageName = prompt('Package Name');
-    $formattedName = str_replace('-', '', ucwords($packageName, '-'));
-    $packageDescription = prompt('Package Description');
+    file_put_contents('README.md', $readmeContent);
+}
+
+/**
+ * Configures the composer.json file for the new package.
+ *
+ * @param $packageName
+ * @param $packageDescription
+ * @return void
+ */
+function configureComposer($packageName, $packageDescription): void
+{
+    $composerData = getComposerContent();
 
     setAuthorInfo($composerData);
     setPackageInfo($composerData, $packageName, $packageDescription);
+
+    $formattedName = str_replace('-', '', ucwords($packageName, '-'));
 
     updateNamespaces($composerData['autoload']['psr-4'], VENDOR, $formattedName);
     updateNamespaces($composerData['autoload-dev']['psr-4'], VENDOR, $formattedName);
@@ -121,4 +156,32 @@ function configureComposer(): void {
     updateComposerContent($composerData);
 }
 
-configureComposer();
+/**
+ * Returns the package information as an array.
+ *
+ * @return array
+ */
+function getPackageInfo(): array
+{
+    $packageName = prompt('Package Name');
+    $packageDescription = prompt('Package Description');
+    return array($packageName, $packageDescription);
+}
+
+/**
+ * Configures the README.md file for the new package.
+ *
+ * @param $packageName
+ * @param $packageDescription
+ * @return void
+ */
+function configureReadme($packageName, $packageDescription): void
+{
+    $readmeContent = getReadmeContent();
+
+    updateReadmeContent($readmeContent, $packageName, $packageDescription);
+}
+
+list($packageName, $packageDescription) = getPackageInfo();
+configureComposer($packageName, $packageDescription);
+configureReadme($packageName, $packageDescription);

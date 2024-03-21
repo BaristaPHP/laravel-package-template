@@ -1,16 +1,19 @@
 <?php
 
-namespace Vendor\PacakgeDatabase\Factories;
+namespace VendorName\Skeleton\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-
+/*
 class ModelFactory extends Factory
 {
-    public function definition(): array
+    protected $model = YourModel::class;
+
+    public function definition()
     {
         return [
-            //
+
         ];
     }
 }
+*/
